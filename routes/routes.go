@@ -15,7 +15,8 @@ func SetupRoutes(app *fiber.App, eventRepo repositories.EventRepository) {
 
 		if err := c.BodyParser(&req); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "cannot parse JSON",
+				"error":  "cannot parse JSON",
+				"detail": fmt.Sprintf("%s", err),
 			})
 		}
 
@@ -26,6 +27,6 @@ func SetupRoutes(app *fiber.App, eventRepo repositories.EventRepository) {
 			})
 		}
 
-		return c.Status(fiber.StatusAccepted).JSON(req)
+		return c.Status(fiber.StatusCreated).JSON(fiber.Map{"status": "success"})
 	})
 }

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -23,9 +24,9 @@ func GetJsonTestRequestResponse(app *fiber.App, method string, url string, reqBo
 	} else {
 		bodyJson, _ := json.Marshal(reqBody)
 		req = httptest.NewRequest(method, url, bytes.NewReader(bodyJson))
-
+		req.Header.Set("Content-Type", "application/json")
 	}
-	req.Header.Set("Content-Type", "application/json")
+
 	resp, err := app.Test(req, 10)
 	code = resp.StatusCode
 	// If error we're done
@@ -53,13 +54,13 @@ func TestRouters(t *testing.T) {
 		description  string
 		route        string
 		expectedCode int
-		payload      event.RequestEvent
+		payload      *event.RequestEvent
 	}{
 		{
 			description:  "post sendEvent valid request",
 			route:        "/api/v1/sendEvent",
 			expectedCode: 201,
-			payload: event.RequestEvent{
+			payload: &event.RequestEvent{
 				Event: event.Event{
 					Hostname:               "https://www.casaevideo.com.br",
 					SiteID:                 "",
@@ -85,15 +86,51 @@ func TestRouters(t *testing.T) {
 				},
 			},
 		},
-		// TODO: add edge cases
+		{
+			description:  "post sendEvent invalid request",
+			route:        "/api/v1/sendEvent",
+			expectedCode: 400,
+			payload:      nil,
+		},
+		{
+			description:  "post sendEvent no SiteName",
+			route:        "/api/v1/sendEvent",
+			expectedCode: 400,
+			payload: &event.RequestEvent{
+				Event: event.Event{
+					Hostname:               "https://www.casaevideo.com.br",
+					SiteID:                 "",
+					SiteName:               "",
+					EventName:              "pageview",
+					StartTime:              time.Date(2023, 7, 27, 2, 52, 8, 0, time.UTC),
+					Pathname:               "/",
+					NavigationFrom:         map[string]string{},
+					EntryMeta:              event.EntryMeta{Key: []string{"Teste AB", "pageId"}, Value: []string{"false", "pages-testeperformance-95d70f581f49"}},
+					UtmMedium:              nil,
+					UtmSource:              nil,
+					UtmCampaign:            nil,
+					UtmContent:             nil,
+					UtmTerm:                nil,
+					Referrer:               "",
+					ReferrerSource:         "direct",
+					ScreenSize:             "2560x1080",
+					Device:                 "desktop",
+					OperatingSystem:        "Linux",
+					OperatingSystemVersion: "Unknown",
+					Browser:                "Chrome",
+					BrowserVersion:         "126",
+				},
+			},
+		},
 	}
 
 	app := fiber.New()
 	SetupRoutes(app, &MockEventRepository{})
 
 	for _, test := range tests {
-		code, _, err := GetJsonTestRequestResponse(app, "POST", test.route, test.payload)
+		code, respBody, err := GetJsonTestRequestResponse(app, "POST", test.route, test.payload)
 		assert.Nil(t, err)
+		fmt.Println(respBody)
 
 		assert.Equalf(t, test.expectedCode, code, test.description)
 	}

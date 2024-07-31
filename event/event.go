@@ -10,29 +10,29 @@ type EntryMeta struct {
 }
 
 type Event struct {
-	Hostname               string            `json:"hostname"`
+	Hostname               string            `validate:"required" json:"hostname"`
+	SiteName               string            `validate:"required" json:"site_name"`
+	EventName              string            `validate:"required" json:"event_name"`
+	StartTime              time.Time         `validate:"required" json:"start_time"`
+	Pathname               string            `validate:"required" json:"pathname"`
+	NavigationFrom         map[string]string `validate:"required" json:"navigation_from"`
+	EntryMeta              EntryMeta         `validate:"required" json:"entry_meta"`
+	ReferrerSource         string            `validate:"required" json:"referrer_source"`
+	ScreenSize             string            `validate:"required" json:"screen_size"`
+	Device                 string            `validate:"required" json:"device"`
+	OperatingSystem        string            `validate:"required" json:"operating_system"`
+	OperatingSystemVersion string            `validate:"required" json:"operating_system_version"`
+	Browser                string            `validate:"required" json:"browser"`
+	BrowserVersion         string            `validate:"required" json:"browser_version"`
+	Referrer               string            `json:"referrer"`
 	SiteID                 string            `json:"site_id"`
-	SiteName               string            `json:"site_name"`
-	EventName              string            `json:"event_name"`
-	StartTime              time.Time         `json:"start_time"`
-	Pathname               string            `json:"pathname"`
-	NavigationFrom         map[string]string `json:"navigation_from"`
-	EntryMeta              EntryMeta         `json:"entry_meta"`
+	UtmTerm                *string           `json:"utm_term"`
 	UtmMedium              *string           `json:"utm_medium"`
 	UtmSource              *string           `json:"utm_source"`
 	UtmCampaign            *string           `json:"utm_campaign"`
 	UtmContent             *string           `json:"utm_content"`
-	UtmTerm                *string           `json:"utm_term"`
-	Referrer               string            `json:"referrer"`
-	ReferrerSource         string            `json:"referrer_source"`
-	ScreenSize             string            `json:"screen_size"`
-	Device                 string            `json:"device"`
-	OperatingSystem        string            `json:"operating_system"`
-	OperatingSystemVersion string            `json:"operating_system_version"`
-	Browser                string            `json:"browser"`
-	BrowserVersion         string            `json:"browser_version"`
 }
 
 type RequestEvent struct {
-	Event Event `json:"event"`
+	Event Event `validate:"required" json:"event"`
 }

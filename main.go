@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/nahumsa/streaming-pipeline-clickhouse/config"
 	"github.com/nahumsa/streaming-pipeline-clickhouse/repositories"
 	"github.com/nahumsa/streaming-pipeline-clickhouse/routes"
 )
@@ -13,7 +14,9 @@ func main() {
 	app := fiber.New()
 	app.Use(logger.New())
 
-	conn, err := repositories.SetupClickhouse("localhost:9000", true)
+	env := config.New()
+
+	conn, err := repositories.SetupClickhouse(env)
 	if err != nil {
 		log.Fatalf("failed to connect to ClickHouse: %v", err)
 	}
@@ -22,5 +25,5 @@ func main() {
 
 	routes.SetupRoutes(app, repo)
 
-	log.Fatal(app.Listen(":3000"))
+	log.Fatal(app.Listen(env.ServerHost))
 }

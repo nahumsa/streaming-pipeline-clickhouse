@@ -85,6 +85,7 @@ func TestRouters(t *testing.T) {
 				},
 			},
 		},
+		// TODO: add edge cases
 	}
 
 	app := fiber.New()

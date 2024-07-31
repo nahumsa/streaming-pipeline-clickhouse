@@ -4,3 +4,5 @@ services:
     image: clickhouse/clickhouse-server
     ports:
       - "9000:9000"
+    volumes:
+      - "./database/01-event-table.sql:/docker-entrypoint-initdb.d/1.sql"

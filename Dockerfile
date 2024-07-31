@@ -10,4 +10,4 @@ FROM scratch
 
 COPY --from=builder /app/main /app/main
 
-ENTRYPOINT ["./app/main"]
+CMD ["./app/main"]

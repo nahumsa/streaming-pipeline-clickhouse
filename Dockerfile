@@ -10,4 +10,5 @@ FROM scratch
 
 COPY --from=builder /app/main /app/main
 
+EXPOSE 3000
 CMD ["./app/main"]

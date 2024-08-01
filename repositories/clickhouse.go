@@ -21,12 +21,9 @@ func NewClickhouseRepository(conn clickhouse.Conn) EventRepository {
 }
 
 func (r *clickhouseRepository) InsertEvent(ctx context.Context, event event.Event) error {
-	batch, err := r.conn.PrepareBatch(ctx, "INSERT INTO events")
-	if err != nil {
-		return err
-	}
-
-	err = batch.Append(
+	if err := r.conn.AsyncInsert(ctx, `INSERT INTO events VALUES (
+			?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+		)`, false,
 		event.Hostname,
 		event.SiteID,
 		event.SiteName,
@@ -48,13 +45,11 @@ func (r *clickhouseRepository) InsertEvent(ctx context.Context, event event.Even
 		event.OperatingSystem,
 		event.OperatingSystemVersion,
 		event.Browser,
-		event.BrowserVersion,
-	)
-	if err != nil {
+		event.BrowserVersion); err != nil {
 		return err
 	}
 
-	return batch.Send()
+	return nil
 }
 
 func SetupClickhouse(environment config.Environment) (clickhouse.Conn, error) {
